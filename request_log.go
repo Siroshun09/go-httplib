@@ -11,19 +11,52 @@ import (
 //
 // It captures key details from an http.Request at a specific point in time.
 type RequestLog struct {
-	Timestamp     time.Time
-	Method        string
-	URL           string
+	// Timestamp is the time when the request was observed/logged.
+	//
+	// It is typically the time right before the handler starts processing the request.
+	Timestamp time.Time
+
+	// Method is the HTTP method of the request (e.g., "GET", "POST").
+	Method string
+
+	// URL is the full request URL as a string.
+	//
+	// This will be an empty string if the original request's URL was nil.
+	URL string
+
+	// ContentLength is the declared size of the request body in bytes.
+	//
+	// A value of -1 indicates that the length is unknown (see http.Request.ContentLength).
 	ContentLength int64
-	Proto         string
-	Host          string
-	RemoteAddr    string
-	UserAgent     string
-	RequestURI    string
-	Referer       string
+
+	// Proto is the HTTP protocol version used by the client (e.g., "HTTP/1.1", "HTTP/2").
+	Proto string
+
+	// Host is the value of the request host (usually from the Host header).
+	Host string
+
+	// RemoteAddr is the client address in the form "IP:port" as reported by the server.
+	//
+	// Use GetIP to extract and parse the IP component.
+	RemoteAddr string
+
+	// UserAgent is the client user agent string.
+	UserAgent string
+
+	// RequestURI is the unmodified request-target as sent by the client.
+	//
+	// It may include the path and query string.
+	RequestURI string
+
+	// Referer is the URL of the resource from which the request originated.
+	//
+	// It is taken from the "Referer" header and may be empty.
+	Referer string
 }
 
 // NewRequestLog creates a RequestLog from an http.Request and timestamp.
+//
+// If r is nil, the returned RequestLog will be empty.
 //
 // If r.URL is nil, the RequestLog.URL will be an empty string.
 func NewRequestLog(r *http.Request, timestamp time.Time) RequestLog {
@@ -51,6 +84,18 @@ func NewRequestLog(r *http.Request, timestamp time.Time) RequestLog {
 }
 
 // ToAttr converts the RequestLog to a structured slog.Attr for logging.
+//
+// Returns a grouped slog.Attr with key "http_request" containing:
+//   - timestamp: request timestamp in RFC3339 format
+//   - method: HTTP method
+//   - url: full request URL
+//   - host: request host
+//   - request_uri: unmodified request-target
+//   - content_length: request body size in bytes (-1 if unknown)
+//   - proto: HTTP protocol version
+//   - remote_addr: client address (IP:port)
+//   - user_agent: client user agent string
+//   - referer: referring URL
 //
 // Returns an empty slog.Attr if the RequestLog is nil.
 func (l *RequestLog) ToAttr() slog.Attr {
