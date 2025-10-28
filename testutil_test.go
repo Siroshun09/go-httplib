@@ -41,3 +41,7 @@ func assertMaxBytesErrorFunc(expectedLimit int64) assert.ErrorAssertionFunc {
 		return assert.Equal(t, expectedLimit, maxBytesErr.Limit)
 	}
 }
+
+func toPtr[T any](value T) *T {
+	return &value
+}
