@@ -1,6 +1,7 @@
 package httplib_test
 
 import (
+	"context"
 	"io"
 	"net/http"
 
@@ -44,4 +45,26 @@ func assertMaxBytesErrorFunc(expectedLimit int64) assert.ErrorAssertionFunc {
 
 func toPtr[T any](value T) *T {
 	return &value
+}
+
+type errorResponseWriter struct {
+	http.ResponseWriter
+	err error
+}
+
+func (w *errorResponseWriter) Write(_ []byte) (n int, err error) {
+	return 0, w.err
+}
+
+type errorResponseBodyRenderer struct {
+	headerErr error
+	bodyErr   error
+}
+
+func (r errorResponseBodyRenderer) RenderHeader(_ context.Context, _ http.Header) error {
+	return r.headerErr
+}
+
+func (r errorResponseBodyRenderer) RenderBody(_ context.Context, _ io.Writer) error {
+	return r.bodyErr
 }
