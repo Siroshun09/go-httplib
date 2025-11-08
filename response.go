@@ -47,6 +47,15 @@ func RenderNoContent(ctx context.Context, w http.ResponseWriter) {
 	renderStatusCode(ctx, w, http.StatusNoContent, nil)
 }
 
+// RenderNoContentForUnauthorized renders a response with status code http.StatusNoContent without body.
+//
+// This function can be used to send the same success response to the client when an authentication error occurs.
+//
+// The cause error will be used for ResponseLog.Error.
+func RenderNoContentForUnauthorized(ctx context.Context, w http.ResponseWriter, cause error) {
+	renderStatusCode(ctx, w, http.StatusNoContent, cause)
+}
+
 // RenderRedirect renders a response with status code http.StatusTemporaryRedirect and a redirect url.
 func RenderRedirect(ctx context.Context, w http.ResponseWriter, r *http.Request, url string) {
 	resPtr := GetResponseLogPtrFromContext(ctx)

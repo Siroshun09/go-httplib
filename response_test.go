@@ -194,6 +194,12 @@ func Test_RenderError(t *testing.T) {
 		wantStatusCode int
 	}{
 		{
+			name:           "NoContentForUnauthorized",
+			cause:          errors.New("unauthorized"),
+			f:              httplib.RenderNoContentForUnauthorized,
+			wantStatusCode: http.StatusNoContent,
+		},
+		{
 			name:           "BadRequest",
 			cause:          errors.New("bad request"),
 			f:              httplib.RenderBadRequest,
