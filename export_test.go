@@ -4,7 +4,11 @@ import (
 	"net/http"
 )
 
-const ContextKeyRequestLog = contextKeyRequestLog
+const (
+	ContextKeyRequestLog  = contextKeyRequestLog
+	ContextKeyResponseLog = contextKeyResponseLog
+	ContextKeyLatency     = contextKeyLatency
+)
 
 func NewHandlerInfoFromPC(pc uintptr, file string, line int) HandlerInfo {
 	return newHandlerInfoFromPC(pc, file, line)

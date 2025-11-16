@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/Siroshun09/go-httplib"
 	"github.com/stretchr/testify/assert"
@@ -38,6 +39,13 @@ func TestContext_RequestLog(t *testing.T) {
 			ctxFunc: func(ctx context.Context) context.Context {
 				ctx = httplib.WithResponseLogPtr(ctx, &httplib.ResponseLog{})
 				return ctx
+			},
+			want: httplib.RequestLog{},
+		},
+		{
+			name: "returns zero when only latency is set",
+			ctxFunc: func(ctx context.Context) context.Context {
+				return httplib.WithLatency(ctx, 100)
 			},
 			want: httplib.RequestLog{},
 		},
@@ -96,4 +104,57 @@ func TestContext_ResponseLogPtr(t *testing.T) {
 		ctx = httplib.WithResponseLogPtr(ctx, nil)
 		assert.Nil(t, httplib.GetResponseLogPtrFromContext(ctx))
 	})
+}
+
+func TestContext_Latency(t *testing.T) {
+	tests := []struct {
+		name    string
+		ctxFunc func(ctx context.Context) context.Context
+		want    time.Duration
+	}{
+		{
+			name: "no latency in context",
+			ctxFunc: func(ctx context.Context) context.Context {
+				return ctx
+			},
+			want: 0,
+		},
+		{
+			name: "set latency",
+			ctxFunc: func(ctx context.Context) context.Context {
+				ctx = httplib.WithLatency(ctx, 100)
+				return ctx
+			},
+			want: 100,
+		},
+		{
+			name: "returns zero when only request log is set",
+			ctxFunc: func(ctx context.Context) context.Context {
+				ctx = httplib.WithRequestLog(ctx, httplib.RequestLog{})
+				return ctx
+			},
+			want: 0,
+		},
+		{
+			name: "returns zero when only response log is set",
+			ctxFunc: func(ctx context.Context) context.Context {
+				ctx = httplib.WithResponseLogPtr(ctx, &httplib.ResponseLog{})
+				return ctx
+			},
+			want: 0,
+		},
+		{
+			name: "wrong type in context",
+			ctxFunc: func(ctx context.Context) context.Context {
+				return context.WithValue(ctx, httplib.ContextKeyLatency, "wrong value")
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := tt.ctxFunc(t.Context())
+			assert.Equal(t, tt.want, httplib.GetLatencyFromContext(ctx))
+		})
+	}
 }

@@ -2,6 +2,7 @@ package httplib
 
 import (
 	"context"
+	"time"
 )
 
 type contextKey uint8
@@ -9,6 +10,7 @@ type contextKey uint8
 const (
 	contextKeyRequestLog contextKey = iota
 	contextKeyResponseLog
+	contextKeyLatency
 )
 
 // GetRequestLogFromContext returns the RequestLog stored in the context.
@@ -59,4 +61,20 @@ func GetResponseLogPtrFromContext(ctx context.Context) *ResponseLog {
 // in data races.
 func WithResponseLogPtr(ctx context.Context, resPtr *ResponseLog) context.Context {
 	return context.WithValue(ctx, contextKeyResponseLog, resPtr)
+}
+
+// GetLatencyFromContext returns the latency stored in the context.
+//
+// If the context does not contain latency, it returns 0.
+func GetLatencyFromContext(ctx context.Context) time.Duration {
+	latency, ok := ctx.Value(contextKeyLatency).(time.Duration)
+	if !ok {
+		return 0
+	}
+	return latency
+}
+
+// WithLatency returns a new context that carries the provided latency.
+func WithLatency(ctx context.Context, latency time.Duration) context.Context {
+	return context.WithValue(ctx, contextKeyLatency, latency)
 }
