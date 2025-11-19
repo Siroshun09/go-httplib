@@ -11,8 +11,8 @@ type httpAttrHandler struct {
 	delegate slog.Handler
 }
 
-// NewHttpAttrHandler creates a new handler that adds slog.Attr of httplib.RequestLog and httplib.ResponseLog to the log record.
-func NewHttpAttrHandler(delegate slog.Handler) slog.Handler {
+// NewHTTPAttrHandler creates a new handler that adds slog.Attr of httplib.RequestLog and httplib.ResponseLog to the log record.
+func NewHTTPAttrHandler(delegate slog.Handler) slog.Handler {
 	return &httpAttrHandler{delegate: delegate}
 }
 
@@ -38,9 +38,9 @@ func (h httpAttrHandler) Handle(ctx context.Context, record slog.Record) error {
 }
 
 func (h httpAttrHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return NewHttpAttrHandler(h.delegate.WithAttrs(attrs))
+	return NewHTTPAttrHandler(h.delegate.WithAttrs(attrs))
 }
 
 func (h httpAttrHandler) WithGroup(name string) slog.Handler {
-	return NewHttpAttrHandler(h.delegate.WithGroup(name))
+	return NewHTTPAttrHandler(h.delegate.WithGroup(name))
 }

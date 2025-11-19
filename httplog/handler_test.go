@@ -52,7 +52,7 @@ func Test_httpAttrHandler_Enabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := t.Context()
-			assert.Equal(t, tt.want, httplog.NewHttpAttrHandler(tt.delegate).Enabled(ctx, tt.level))
+			assert.Equal(t, tt.want, httplog.NewHTTPAttrHandler(tt.delegate).Enabled(ctx, tt.level))
 		})
 	}
 }
@@ -253,7 +253,7 @@ func Test_httpAttrHandler_Handle(t *testing.T) {
 
 			gotRecord := originalRecord.Clone()
 			mockHandler := &slogHandlerMock{}
-			err := httplog.NewHttpAttrHandler(mockHandler).Handle(ctx, gotRecord)
+			err := httplog.NewHTTPAttrHandler(mockHandler).Handle(ctx, gotRecord)
 			assert.Equal(t, 1, mockHandler.handleCallCount)
 			assert.Equal(t, ctx, mockHandler.handledCtx)
 			assert.Equal(t, tt.wantRecord, mockHandler.handledRecord)
@@ -347,7 +347,7 @@ func Test_httpAttrHandler_Handle_Log(t *testing.T) {
 
 				buf := &strings.Builder{}
 				jsonHandler := slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug})
-				httpAttrHandler := httplog.NewHttpAttrHandler(jsonHandler)
+				httpAttrHandler := httplog.NewHTTPAttrHandler(jsonHandler)
 				logger := slog.New(httpAttrHandler)
 
 				timeReplacedWant := make([]string, len(tt.want))
@@ -395,8 +395,8 @@ func Test_httpAttrHandler_WithAttrs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := httplog.NewHttpAttrHandler(handler).WithAttrs(tt.attrs)
-			assert.True(t, httplog.IsHttpAttrHandler(got))
+			got := httplog.NewHTTPAttrHandler(handler).WithAttrs(tt.attrs)
+			assert.True(t, httplog.IsHTTPAttrHandler(got))
 		})
 	}
 }
@@ -419,8 +419,8 @@ func Test_httpAttrHandler_WithGroup(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := httplog.NewHttpAttrHandler(handler).WithGroup(tt.groupName)
-			assert.True(t, httplog.IsHttpAttrHandler(got))
+			got := httplog.NewHTTPAttrHandler(handler).WithGroup(tt.groupName)
+			assert.True(t, httplog.IsHTTPAttrHandler(got))
 		})
 	}
 }
@@ -443,13 +443,13 @@ func TestIsHttpAttrHandler(t *testing.T) {
 		},
 		{
 			name: "http attr handler",
-			h:    httplog.NewHttpAttrHandler(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelWarn})),
+			h:    httplog.NewHTTPAttrHandler(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelWarn})),
 			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, httplog.IsHttpAttrHandler(tt.h))
+			assert.Equal(t, tt.want, httplog.IsHTTPAttrHandler(tt.h))
 		})
 	}
 }
