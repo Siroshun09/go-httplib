@@ -52,6 +52,72 @@ func TestHTTPServerRunner_Shutdown_CompleteSlowRequest(t *testing.T) {
 	assert.Error(t, err, "expected error after shutdown")
 }
 
+func TestHTTPServerRunner_Shutdown_ZeroTimeout(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+
+	s, base, _, stop := startTestHTTPServerRunner(ctx, t)
+	defer stop()
+
+	client := &http.Client{}
+
+	// Trigger shutdown during the slow handler
+	reqDone := make(chan struct{})
+	shutdownFinished := make(chan struct{})
+	go func() {
+		<-reqDone
+		assert.NoError(t, s.Shutdown(0))
+		close(shutdownFinished)
+	}()
+
+	resp, err := client.Get(base + "/slow")
+	reqDone <- struct{}{}
+
+	require.NoError(t, err)
+	require.NoError(t, resp.Body.Close())
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	<-shutdownFinished
+
+	// Further requests should fail
+	resp, err = client.Get(base + "/ok")
+	assert.Nil(t, resp)
+	assert.Error(t, err, "expected error after shutdown")
+}
+
+func TestHTTPServerRunner_Shutdown_MinusTimeout(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+
+	s, base, _, stop := startTestHTTPServerRunner(ctx, t)
+	defer stop()
+
+	client := &http.Client{}
+
+	// Trigger shutdown during the slow handler
+	reqDone := make(chan struct{})
+	shutdownFinished := make(chan struct{})
+	go func() {
+		<-reqDone
+		assert.NoError(t, s.Shutdown(-1))
+		close(shutdownFinished)
+	}()
+
+	resp, err := client.Get(base + "/slow")
+	reqDone <- struct{}{}
+
+	require.NoError(t, err)
+	require.NoError(t, resp.Body.Close())
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	<-shutdownFinished
+
+	// Further requests should fail
+	resp, err = client.Get(base + "/ok")
+	assert.Nil(t, resp)
+	assert.Error(t, err, "expected error after shutdown")
+}
+
 func TestHTTPServerRunner_Shutdown_KeepAlive_IdleClosed(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
