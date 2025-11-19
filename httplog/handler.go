@@ -11,6 +11,7 @@ type httpAttrHandler struct {
 	delegate slog.Handler
 }
 
+// NewHttpAttrHandler creates a new handler that adds slog.Attr of httplib.RequestLog and httplib.ResponseLog to the log record.
 func NewHttpAttrHandler(delegate slog.Handler) slog.Handler {
 	return &httpAttrHandler{delegate: delegate}
 }
