@@ -279,7 +279,7 @@ func Test_httpAttrHandler_Handle_Log(t *testing.T) {
 			},
 			want: []string{
 				`{` +
-					`"time":"2000-01-01T09:00:00+09:00","level":"INFO","msg":"test log",` +
+					`"time":"%TIME%","level":"INFO","msg":"test log",` +
 					`"http_request":{"timestamp":"0001-01-01T00:00:00Z","method":"","url":"","host":"","request_uri":"","content_length":0,"proto":"","remote_addr":"","user_agent":"","referer":""}` +
 					`}`,
 			},
@@ -294,7 +294,7 @@ func Test_httpAttrHandler_Handle_Log(t *testing.T) {
 			},
 			want: []string{
 				`{` +
-					`"time":"2000-01-01T09:00:00+09:00","level":"INFO","msg":"test log",` +
+					`"time":"%TIME%","level":"INFO","msg":"test log",` +
 					`"http_request":{"timestamp":"0001-01-01T00:00:00Z","method":"","url":"","host":"","request_uri":"","content_length":0,"proto":"","remote_addr":"","user_agent":"","referer":""}` +
 					`}`,
 			},
@@ -312,7 +312,7 @@ func Test_httpAttrHandler_Handle_Log(t *testing.T) {
 			},
 			want: []string{
 				`{` +
-					`"time":"2000-01-01T09:00:00+09:00","level":"INFO","msg":"test log",` +
+					`"time":"%TIME%","level":"INFO","msg":"test log",` +
 					`"http_request":{"timestamp":"2024-12-31T23:59:59Z","method":"GET","url":"https://example.com/a?b=c","host":"example.com","request_uri":"/a?b=c","content_length":123,"proto":"HTTP/2.0","remote_addr":"203.0.113.1:4444","user_agent":"ua/3.0","referer":"https://ref.example.com/"},` +
 					`"http_response":{"latency":10000,"status_code":500,"response_size":100,"error":"internal server error","handler":{"func_name":"func_status_internal_server_error","file":"file_status_internal_server_error.go","line":2}}` +
 					`}`,
@@ -331,7 +331,7 @@ func Test_httpAttrHandler_Handle_Log(t *testing.T) {
 			},
 			want: []string{
 				`{` +
-					`"time":"2000-01-01T09:00:00+09:00","level":"INFO","msg":"test log",` +
+					`"time":"%TIME%","level":"INFO","msg":"test log",` +
 					`"key1":"value","key2":1,"key3":3.14,"key4":true,` +
 					`"http_request":{"timestamp":"2024-12-31T23:59:59Z","method":"GET","url":"https://example.com/a?b=c","host":"example.com","request_uri":"/a?b=c","content_length":123,"proto":"HTTP/2.0","remote_addr":"203.0.113.1:4444","user_agent":"ua/3.0","referer":"https://ref.example.com/"},` +
 					`"http_response":{"latency":10000,"status_code":500,"response_size":100,"error":"internal server error","handler":{"func_name":"func_status_internal_server_error","file":"file_status_internal_server_error.go","line":2}}` +
@@ -350,8 +350,13 @@ func Test_httpAttrHandler_Handle_Log(t *testing.T) {
 				httpAttrHandler := httplog.NewHttpAttrHandler(jsonHandler)
 				logger := slog.New(httpAttrHandler)
 
+				timeReplacedWant := make([]string, len(tt.want))
+				for i, want := range tt.want {
+					timeReplacedWant[i] = strings.Replace(want, "%TIME%", time.Now().Format(time.RFC3339Nano), 1)
+				}
+
 				tt.call(ctx, logger)
-				assert.Equal(t, tt.want, strings.Split(strings.TrimRight(buf.String(), "\n"), "\n"))
+				assert.Equal(t, timeReplacedWant, strings.Split(strings.TrimRight(buf.String(), "\n"), "\n"))
 			})
 		})
 	}
