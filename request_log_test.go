@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/netip"
 	"testing"
 	"time"
 
@@ -172,6 +173,45 @@ func TestRequestLog_GetIP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, tt.log.GetIP())
+		})
+	}
+}
+
+func TestRequestLog_GetAddr(t *testing.T) {
+	tests := []struct {
+		name string
+		log  *httplib.RequestLog
+		want netip.Addr
+	}{
+		{
+			name: "nil",
+			log:  nil,
+			want: netip.Addr{},
+		},
+		{
+			name: "invalid remote addr (no port)",
+			log:  &httplib.RequestLog{RemoteAddr: "invalid"},
+			want: netip.Addr{},
+		},
+		{
+			name: "unparsable host",
+			log:  &httplib.RequestLog{RemoteAddr: "notanip:80"},
+			want: netip.Addr{},
+		},
+		{
+			name: "valid IPv4",
+			log:  &httplib.RequestLog{RemoteAddr: "192.0.2.1:1234"},
+			want: netip.MustParseAddr("192.0.2.1"),
+		},
+		{
+			name: "valid IPv6 (with brackets)",
+			log:  &httplib.RequestLog{RemoteAddr: "[2001:db8::1]:443"},
+			want: netip.MustParseAddr("2001:db8::1"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.log.GetAddr())
 		})
 	}
 }

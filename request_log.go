@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"net/netip"
 	"time"
 )
 
@@ -141,4 +142,20 @@ func (l *RequestLog) GetIP() net.IP {
 	}
 
 	return ip.To16()
+}
+
+// GetAddr extracts and parses the IP address from RemoteAddr.
+//
+// Returns an empty netip.Addr if the RequestLog is nil, the address cannot be parsed, or the host portion is not a valid IP address.
+func (l *RequestLog) GetAddr() netip.Addr {
+	if l == nil {
+		return netip.Addr{}
+	}
+
+	addrPort, err := netip.ParseAddrPort(l.RemoteAddr)
+	if err != nil {
+		return netip.Addr{}
+	}
+
+	return addrPort.Addr()
 }
