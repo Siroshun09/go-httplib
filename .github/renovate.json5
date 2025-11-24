@@ -1,23 +1,7 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    'config:recommended',
-    'helpers:pinGitHubActionDigests',
-  ],
-  packageRules: [
-    {
-      groupName: 'all non-major dependencies for go',
-      groupSlug: 'go-all-minor-patch',
-      matchManagers: [
-        'gomod',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      matchPackageNames: [
-        '*',
-      ],
-    },
-  ],
+    'github>Siroshun09/renovate-config//github-actions/renovate.json5',
+    'github>Siroshun09/renovate-config//go/renovate.json5'
+  ]
 }
