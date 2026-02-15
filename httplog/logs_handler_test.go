@@ -178,20 +178,22 @@ func Test_logger_Log(t *testing.T) {
 					ctx := t.Context()
 					ctx = c.ctxFunc(ctx)
 
-					var expectedAttrs []slog.Attr
-					expectedAttrs = append(expectedAttrs, attrs...)
-					expectedAttrs = append(expectedAttrs, c.expectedAttrsFunc()...)
+					attrsCond := gomock.Cond(func(x []slog.Attr) bool {
+						var expectedAttrs []slog.Attr
+						expectedAttrs = append(expectedAttrs, attrs...)
+						expectedAttrs = append(expectedAttrs, c.expectedAttrsFunc()...)
+
+						if len(expectedAttrs) == 0 {
+							return assert.Empty(t, x)
+						}
+						return assert.Equal(t, expectedAttrs, x)
+					})
 
 					t.Run("Debug", func(t *testing.T) {
 						ctrl := gomock.NewController(t)
 						mock := logmock.NewMockLogger(ctrl)
 
-						mock.EXPECT().Debug(ctx, "test", gomock.Cond(func(x []slog.Attr) bool {
-							if len(expectedAttrs) == 0 {
-								return assert.Empty(t, x)
-							}
-							return assert.Equal(t, expectedAttrs, x)
-						}))
+						mock.EXPECT().Debug(ctx, "test", attrsCond)
 
 						l := httplog.NewHTTPAttrLogger(mock)
 						l.Debug(ctx, "test", attrs...)
@@ -201,12 +203,7 @@ func Test_logger_Log(t *testing.T) {
 						ctrl := gomock.NewController(t)
 						mock := logmock.NewMockLogger(ctrl)
 
-						mock.EXPECT().Info(ctx, "test", gomock.Cond(func(x []slog.Attr) bool {
-							if len(expectedAttrs) == 0 {
-								return assert.Empty(t, x)
-							}
-							return assert.Equal(t, expectedAttrs, x)
-						}))
+						mock.EXPECT().Info(ctx, "test", attrsCond)
 
 						l := httplog.NewHTTPAttrLogger(mock)
 						l.Info(ctx, "test", attrs...)
@@ -217,12 +214,7 @@ func Test_logger_Log(t *testing.T) {
 						mock := logmock.NewMockLogger(ctrl)
 						err := errors.New("test error")
 
-						mock.EXPECT().Warn(ctx, err, gomock.Cond(func(x []slog.Attr) bool {
-							if len(expectedAttrs) == 0 {
-								return assert.Empty(t, x)
-							}
-							return assert.Equal(t, expectedAttrs, x)
-						}))
+						mock.EXPECT().Warn(ctx, err, attrsCond)
 
 						l := httplog.NewHTTPAttrLogger(mock)
 						l.Warn(ctx, err, attrs...)
@@ -233,12 +225,7 @@ func Test_logger_Log(t *testing.T) {
 						mock := logmock.NewMockLogger(ctrl)
 						err := errors.New("test error")
 
-						mock.EXPECT().Error(ctx, err, gomock.Cond(func(x []slog.Attr) bool {
-							if len(expectedAttrs) == 0 {
-								return assert.Empty(t, x)
-							}
-							return assert.Equal(t, expectedAttrs, x)
-						}))
+						mock.EXPECT().Error(ctx, err, attrsCond)
 
 						l := httplog.NewHTTPAttrLogger(mock)
 						l.Error(ctx, err, attrs...)
