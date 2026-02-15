@@ -16,6 +16,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewHTTPAttrHandler(t *testing.T) {
+	tests := []struct {
+		name           string
+		delegate       slog.Handler
+		panicAssertion assert.PanicAssertionFunc
+	}{
+		{
+			name:           "success",
+			delegate:       slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelWarn}),
+			panicAssertion: assert.NotPanics,
+		},
+		{
+			name:           "panic: delegate is nil",
+			delegate:       nil,
+			panicAssertion: assert.Panics,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.panicAssertion(t, func() {
+				got := httplog.NewHTTPAttrHandler(tt.delegate)
+				assert.True(t, httplog.IsHTTPAttrHandler(got))
+			})
+		})
+	}
+}
+
 func Test_httpAttrHandler_Enabled(t *testing.T) {
 	handler := slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelWarn})
 	tests := []struct {
