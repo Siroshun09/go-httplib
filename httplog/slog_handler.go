@@ -19,11 +19,11 @@ func NewHTTPAttrHandler(delegate slog.Handler) slog.Handler {
 	return &httpAttrHandler{delegate: delegate}
 }
 
-func (h httpAttrHandler) Enabled(ctx context.Context, level slog.Level) bool {
+func (h *httpAttrHandler) Enabled(ctx context.Context, level slog.Level) bool {
 	return h.delegate.Enabled(ctx, level)
 }
 
-func (h httpAttrHandler) Handle(ctx context.Context, record slog.Record) error {
+func (h *httpAttrHandler) Handle(ctx context.Context, record slog.Record) error {
 	if ctx == nil {
 		return h.delegate.Handle(ctx, record)
 	}
@@ -40,10 +40,10 @@ func (h httpAttrHandler) Handle(ctx context.Context, record slog.Record) error {
 	return h.delegate.Handle(ctx, record)
 }
 
-func (h httpAttrHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+func (h *httpAttrHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return NewHTTPAttrHandler(h.delegate.WithAttrs(attrs))
 }
 
-func (h httpAttrHandler) WithGroup(name string) slog.Handler {
+func (h *httpAttrHandler) WithGroup(name string) slog.Handler {
 	return NewHTTPAttrHandler(h.delegate.WithGroup(name))
 }
