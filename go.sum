@@ -1,7 +1,7 @@
-github.com/Siroshun09/logs/logmock/v2 v2.0.0-rc.1 h1:W/CAunkcK0zJTEy7CLw+HFGDZjsuIUJ7eUYyG+Szty8=
-github.com/Siroshun09/logs/logmock/v2 v2.0.0-rc.1/go.mod h1:QjkV9KTpvaNqfQkuiUbwgN1CdPHLhaVrwVOePI1QerM=
-github.com/Siroshun09/logs/v2 v2.0.0-rc.1 h1:Z7j9hup3q6mErDopp2LiY1+9VDjVk+ZjokwuUHg/Zkw=
-github.com/Siroshun09/logs/v2 v2.0.0-rc.1/go.mod h1:h7e6KzxJ9+FJRe3vVkavd9+yCyJ5iRaqBc+6wYYAVWM=
+github.com/Siroshun09/logs/logmock/v2 v2.0.0 h1:w7Kr4vxvJQtpMzd6pm9lRaF4rboETE61+SdThZ5lU/Y=
+github.com/Siroshun09/logs/logmock/v2 v2.0.0/go.mod h1:5IfjgLTmvds9x7ZZMQ37azaOIZpL7gFpmrreyyEti78=
+github.com/Siroshun09/logs/v2 v2.0.0 h1:WYfnwfBXBEOe9aN5OKa2F9gfhncA9cREoIkfsNDOj58=
+github.com/Siroshun09/logs/v2 v2.0.0/go.mod h1:h7e6KzxJ9+FJRe3vVkavd9+yCyJ5iRaqBc+6wYYAVWM=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
